@@ -1,8 +1,6 @@
 const fs = require('fs');
 const http = require('http');
-const { dirname } = require('path');
 const url = require('url');
-
 
 //Files
 //sycrounose(blocking)
@@ -29,6 +27,9 @@ const url = require('url');
 // })
 // console.log('will read the file');
 
+const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8',);
+const tempCart = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8',);
+const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8',);
 
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8',);
 const dataObject = JSON.parse(data)
@@ -37,11 +38,18 @@ const dataObject = JSON.parse(data)
 const server = http.createServer((req, res) => {
     const pathName = req.url
 
+    //overviw
     if (pathName === '/' || pathName === '/overview') {
-        res.end('Hello from your servessssssssr')
-    } else if (pathName === '/product') {
-        res.end('Hello from your product')
+        // res.end('Hello from your servessssssssr')
+        res.writeHead(200, { 'Content-type': 'text/html' })
+        res.end(tempOverview)
     }
+
+    //product
+    else if (pathName === '/product') {
+        res.end(tempProduct)
+    }
+    //API
     else if (pathName === '/api') {
         //this is not effient couse for each requst it read again
         // fs.readFile(`${__dirname}/dev-data/data.json`, 'utf-8', (err, data) => {
@@ -51,9 +59,10 @@ const server = http.createServer((req, res) => {
         // })
 
         //effient way is to take it outside
-            res.writeHead(200, {'Content-type': 'application/json'})
-            res.end(data);
+        res.writeHead(200, { 'Content-type': 'application/json' })
+        res.end(data);
     }
+    //ERROR
     else {
         res.writeHead(404, {
             'content-type': 'text/html',
