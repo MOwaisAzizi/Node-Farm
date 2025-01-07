@@ -2,6 +2,8 @@ const fs = require('fs');
 const http = require('http');
 const url = require('url');
 
+const replaceTemplate = require('./modules/replaceTemplate')
+
 //Files
 //sycrounose(blocking)
 ////read
@@ -27,6 +29,18 @@ const url = require('url');
 // })
 // console.log('will read the file');
 
+// const replaceTemplate = (tempCart,product)=>{
+//     let output = tempCart.replace(/{%PRODUCTNAME%}/g, product.productName)
+//      output = output.replace(/{%IMAGE%}/g, product.image)
+//      output = output.replace(/{%NUTRIENTS%}/g, product.nutrients)
+//      output = output.replace(/{%QUANTITY%}/g, product.quantity)
+//      output = output.replace(/{%PRICE%}/g, product.price)
+//      output = output.replace(/{%ID%}/g, product.id)
+//      output = output.replace(/{%DESCRIPTION%}/g, product.description)
+//     if(!product.organic) output = output.replace(/{%NOT_ORGANIC%}/g, 'not-organic')        
+//     return output
+//     }
+
 const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8',);
 const tempCart = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8',);
 const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8',);
@@ -34,38 +48,30 @@ const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.htm
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8',);
 const dataObj = JSON.parse(data)
 
-const replaceTemplate = (tempCart,product)=>{
-    let output = tempCart.replace(/{%PRODUCTNAME%}/g, product.productName)
-     output = output.replace(/{%IMAGE%}/g, product.image)
-     output = output.replace(/{%NUTRIENTS%}/g, product.nutrients)
-     output = output.replace(/{%QUANTITY%}/g, product.quantity)
-     output = output.replace(/{%PRICE%}/g, product.price)
-     output = output.replace(/{%ID%}/g, product.id)
-    if(!product.organic) output = output.replace(/{%NOT_ORGANIC%}/g, 'not-organic')        
-    return output
-    }
 
 ////Server every thing in it recreate for each request
 const server = http.createServer((req, res) => {
-    const pathName = req.url
+    // const pathname = req.url
+    const {query,pathname} = url.parse(req.url,true)
 
     //overviw
-    if (pathName === '/' || pathName === '/overview') {
+    if (pathname === '/' || pathname === '/overview') {
         res.writeHead(200, { 'Content-type': 'text/html' })
-
-        const cartHtml = dataObj.map(el=>replaceTemplate(tempCart,el)).join('')
-        console.log(cartHtml);
-        
+        const cartHtml = dataObj.map(el=>replaceTemplate(tempCart,el)).join('')        
         const output = tempOverview.replace(/{%PRODUCT_CARDS%}/g, cartHtml)
         res.end(output)
     }
 
     //product
-    else if (pathName === '/product') {
-
+    else if (pathname === '/product') {
+        res.writeHead(200, { 'Content-type': 'text/html' })
+        const product = dataObj[query.id]
+        const output = replaceTemplate(tempProduct,product)
+        res.end(output)
     }
+
     //API
-    else if (pathName === '/api') {
+    else if (pathname === '/api') {
         //this is not effient couse for each requst it read again
         // fs.readFile(`${__dirname}/dev-data/data.json`, 'utf-8', (err, data) => {
         //     const productData = JSON.parse(data)
