@@ -53,7 +53,7 @@ const slugs = dataObj.map(el => slugify(el.productName, { lower: true }))
 console.log(slugs);
 
 
-////Server every thing in it recreate for each request
+////Server every thing in it recreate for each request(so take some heavy task out of that)
 const server = http.createServer((req, res) => {
     // const pathname = req.url
     const { query, pathname } = url.parse(req.url, true)
