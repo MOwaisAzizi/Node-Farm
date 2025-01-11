@@ -41,6 +41,7 @@ const replaceTemplate = require('./modules/replaceTemplate')
 //     return output
 //     }
 
+//build in templets
 const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8',);
 const tempCart = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8',);
 const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8',);
@@ -52,12 +53,12 @@ const slugs = dataObj.map(el => slugify(el.productName, { lower: true }))
 console.log(slugs);
 
 
-
 ////Server every thing in it recreate for each request
 const server = http.createServer((req, res) => {
     // const pathname = req.url
     const { query, pathname } = url.parse(req.url, true)
-
+   console.log(query,pathname);
+   
     //overviw
     if (pathname === '/' || pathname === '/overview') {
         res.writeHead(200, { 'Content-type': 'text/html' })
