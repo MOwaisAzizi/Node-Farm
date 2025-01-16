@@ -41,6 +41,7 @@ const replaceTemplate = require('./modules/replaceTemplate')
 //     return output
 //     }
 
+//build in templets
 const tempCart = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8',);
 const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8',);
 const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8',);
@@ -48,10 +49,16 @@ const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.htm
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8',);
 const dataObj = JSON.parse(data)
 
+const slugs = dataObj.map(el => slugify(el.productName, { lower: true }))
+
+
+////Server every thing in it recreate for each request(so take some heavy task out of that for performance)
 const server = http.createServer((req, res) => {
+    // const pathname = req.url
     const { query, pathname } = url.parse(req.url, true)
    console.log(query,pathname);
    
+    //overviw
     if (pathname === '/' || pathname === '/overview') {
         res.writeHead(200, { 'Content-type': 'text/html' })
         const cartHtml = dataObj.map(el => replaceTemplate(tempCart, el)).join('')
@@ -59,6 +66,7 @@ const server = http.createServer((req, res) => {
         res.end(output)
     }
 
+    //product
     else if (pathname === '/product') {
         res.writeHead(200, { 'Content-type': 'text/html' })
         const product = dataObj[query.id]
@@ -66,11 +74,20 @@ const server = http.createServer((req, res) => {
         res.end(output)
     }
 
+    //API
     else if (pathname === '/api') {
+        //this is not effient couse for each requst it read again
+        // fs.readFile(`${__dirname}/dev-data/data.json`, 'utf-8', (err, data) => {
+        //     const productData = JSON.parse(data)
+        //     res.writeHead(200, {'Content-type': 'application/json'})
+        //     res.end(data);
+        // })
+
+        //effient way is to take it outside
         res.writeHead(200, { 'Content-type': 'application/json' })
         res.end(data);
     }
-
+    //ERROR
     else {
         res.writeHead(404, {
             'content-type': 'text/html',
@@ -80,6 +97,7 @@ const server = http.createServer((req, res) => {
     }
 
 })
+//listen to incomming request on port 8000 and host 127
 server.listen(8000, '127.0.0.1', () => {
     console.log('listen to sever on port 8000');
 })
