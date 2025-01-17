@@ -6,11 +6,9 @@ const replaceTemplate = require('./modules/replaceTemplate')
 
 //Files
 //sycrounose(blocking)
-////read
 // const textIn = fs.readFileSync('./txt/input.txt','utf-8')
 // console.log(textIn);
 
-// // write
 // const textOut = `this is what we create ${textIn} \n created ${Date.now()}`
 //  fs.writeFileSync('./txt/output.txt',textOut)
 
