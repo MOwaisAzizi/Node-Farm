@@ -1,3 +1,4 @@
+ //own Module
  module.exports = (tempCart,product)=>{
     let output = tempCart.replace(/{%PRODUCTNAME%}/g, product.productName)
      output = output.replace(/{%IMAGE%}/g, product.image)
